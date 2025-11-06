@@ -1,16 +1,11 @@
 using UnityEngine;
 
-public class BuildingData : MonoBehaviour
+[CreateAssetMenu(menuName = "Data/Building")]
+public class BuildingData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [field: SerializeField] public string Description { get; private set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [field: SerializeField] public int Cost { get; private set; }
+
+    [field: SerializeField] public BuildingModels Model { get; private set; }
 }
