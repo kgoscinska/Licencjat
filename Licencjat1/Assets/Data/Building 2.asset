@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Building 2
   m_EditorClassIdentifier: 
   <Description>k__BackingField: Grass
-  <Cost>k__BackingField: 1
-  <Model>k__BackingField: {fileID: 5838450376864336758, guid: 05e83912f44c2494fa93609acc11ef4c, type: 3}
+  <Cost>k__BackingField: 2
+  <Model>k__BackingField: {fileID: 6784093326360866280, guid: 05e83912f44c2494fa93609acc11ef4c, type: 3}
