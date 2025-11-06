@@ -99,4 +99,13 @@ public class BuildingSystem : MonoBehaviour
         buildingPreview.Setup(data);
         return buildingPreview;
     }
+    public bool HasActivePreview() => preview != null;
+    public void CancelPreview()
+    {
+        if (preview != null)
+        {
+            Destroy(preview.gameObject);
+            preview = null;
+        }
+    }
 }

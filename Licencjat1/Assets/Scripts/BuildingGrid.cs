@@ -8,6 +8,9 @@ public class BuildingGrid : MonoBehaviour
     [SerializeField] private int height;
 
     private BuildingGridCell[,] grid;
+    public BuildingGridCell[,] GetGrid() => grid;
+    public int GetLength(int dimension) => grid.GetLength(dimension);
+    public BuildingGridCell GetCell(int x, int y) => grid[x, y];
 
     private void Start()
     {
@@ -82,6 +85,8 @@ public class BuildingGrid : MonoBehaviour
 public class BuildingGridCell
 {
     private Building building;
+    public Building GetBuilding() => building;
+    public void Clear() => building = null;
 
     public void SetBuilding(Building building)
     {
