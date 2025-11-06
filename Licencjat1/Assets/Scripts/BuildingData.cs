@@ -9,3 +9,4 @@ public class BuildingData : ScriptableObject
 
     [field: SerializeField] public BuildingModels Model { get; private set; }
 }
+ 

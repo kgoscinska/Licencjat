@@ -30,9 +30,9 @@ public class BuildingGrid : MonoBehaviour
         }
     }
 
-    public bool CanBuild(List<Vector3> allBuildingPosition)
+    public bool CanBuild(List<Vector3> allBuildingPositions)
     {
-        foreach (var p in allBuildingPosition)
+        foreach (var p in allBuildingPositions)
         {
             (int x, int y) = WorldToGridPosition(p);
             if (x < 0 || x >= width || y < 0 || y >= height) return false;
@@ -77,6 +77,6 @@ public class BuildingGridCell
 
     public bool IsEmpty()
     {
-        return this.building == null;
+        return building == null;
     }
 }

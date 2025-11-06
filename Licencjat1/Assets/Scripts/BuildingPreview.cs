@@ -10,6 +10,7 @@ public class BuildingPreview : MonoBehaviour
     }
 
     [SerializeField] private Material positiveMaterial;
+
     [SerializeField] private Material negativeMaterial;
 
     public BuildingPreviewState State { get; private set; } = BuildingPreviewState.NEGATIVE;

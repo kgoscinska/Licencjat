@@ -4,8 +4,8 @@ using System.Collections.Generic;
 
 public class BuildingModels : MonoBehaviour
 {
-    [SerializeField] private Transform Wrapper;
-    public float Rotation => Wrapper.transform.eulerAngles.y;
+    [SerializeField] private Transform wrapper;
+    public float Rotation => wrapper.transform.eulerAngles.y;
 
     private BuildingShapeUnit[] shapeUnits;
 
@@ -16,7 +16,7 @@ public class BuildingModels : MonoBehaviour
 
     public void Rotate(float rotationStep)
     {
-        Wrapper.Rotate(new(0, rotationStep, 0));
+        wrapper.Rotate(new(0, rotationStep, 0));
     }
     public List<Vector3> GetAllBuldingPosition()
     {
