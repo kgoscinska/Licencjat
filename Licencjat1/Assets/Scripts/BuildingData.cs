@@ -4,9 +4,6 @@ using UnityEngine;
 public class BuildingData : ScriptableObject
 {
     [field: SerializeField] public string Description { get; private set; }
-
     [field: SerializeField] public int Cost { get; private set; }
-
     [field: SerializeField] public BuildingModels Model { get; private set; }
 }
- 

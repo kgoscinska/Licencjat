@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ae7826f80adaea41814ffbbed8ce7b9, type: 3}
   m_Name: Building 1
   m_EditorClassIdentifier: 
-  <Description>k__BackingField: BuildingData1
+  <Description>k__BackingField: Build1
   <Cost>k__BackingField: 1
   <Model>k__BackingField: {fileID: 6784093326360866280, guid: c23431dadbf149d41b8944048b6d575e, type: 3}
