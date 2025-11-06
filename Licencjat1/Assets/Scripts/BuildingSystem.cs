@@ -23,12 +23,26 @@ public class BuildingSystem : MonoBehaviour
         if (preview != null)
         {
             HandlePreview(mousePos);
+
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
+            {
+                CancelCurrentPreview();
+            }
         }
         else
         {
             if (Input.GetKeyDown(KeyCode.Alpha1)) preview = CreatePreview(buildingData1, mousePos);
             else if (Input.GetKeyDown(KeyCode.Alpha2)) preview = CreatePreview(buildingData2, mousePos);
             else if (Input.GetKeyDown(KeyCode.Alpha3)) preview = CreatePreview(buildingData3, mousePos);
+        }
+    }
+
+    private void CancelCurrentPreview()
+    {
+        if (preview != null)
+        {
+            Destroy(preview.gameObject);
+            preview = null;
         }
     }
 
@@ -108,4 +122,5 @@ public class BuildingSystem : MonoBehaviour
             preview = null;
         }
     }
+
 }
