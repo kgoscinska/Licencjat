@@ -174,6 +174,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2003333251761730352}
   - component: {fileID: 6784093326360866280}
+  - component: {fileID: 8536165238619537269}
   m_Layer: 0
   m_Name: BuildingModel3
   m_TagString: Untagged
@@ -210,3 +211,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wrapper: {fileID: 135969179057626054}
+--- !u!64 &8536165238619537269
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7383744860529973481}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5092800715959946173, guid: 0acfe21d42b29ca44b6e80729c1b759e, type: 3}

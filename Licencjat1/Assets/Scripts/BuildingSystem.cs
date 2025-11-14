@@ -15,6 +15,12 @@ public class BuildingSystem : MonoBehaviour
     [SerializeField] private BuildingGrid grid;
 
     private BuildingPreview preview;
+    private bool isMovingBuilding = false;
+
+    private BuildingData oldData;
+    private float oldRotation;
+    private Vector3 oldCenterPos;
+    private List<Vector3> oldPositions;
 
     private void Update()
     {
@@ -28,6 +34,35 @@ public class BuildingSystem : MonoBehaviour
             {
                 CancelCurrentPreview();
             }
+            else if (isMovingBuilding)
+            {
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (preview.State == BuildingPreview.BuildingPreviewState.POSITIVE)
+                    {
+                        List<Vector3> finalBuildPosition = preview.BuildingModels.GetRotatedShapeUnitOffsets()
+                            .Select(offset => preview.transform.position + offset).ToList();
+                        PlaceBuilding(finalBuildPosition);
+                    }
+                    else
+                    {
+                        CancelCurrentPreview();
+                    }
+                }
+            }
+            else
+            {
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (preview.State == BuildingPreview.BuildingPreviewState.POSITIVE)
+                    {
+                        List<Vector3> finalBuildPosition = preview.BuildingModels.GetRotatedShapeUnitOffsets()
+                            .Select(offset => preview.transform.position + offset).ToList();
+                        PlaceBuilding(finalBuildPosition);
+                    }
+                }
+            }
         }
         else
         {
@@ -39,6 +74,15 @@ public class BuildingSystem : MonoBehaviour
 
     private void CancelCurrentPreview()
     {
+        if (isMovingBuilding)
+        {
+
+            Building restoredBuilding = Instantiate(buildingPrefab, oldCenterPos, Quaternion.identity);
+            restoredBuilding.Setup(oldData, oldRotation);
+            grid.SetBuilding(restoredBuilding, oldPositions);
+            isMovingBuilding = false;
+        }
+
         if (preview != null)
         {
             Destroy(preview.gameObject);
@@ -48,28 +92,28 @@ public class BuildingSystem : MonoBehaviour
 
     private void HandlePreview(Vector3 mouseWorldPosition)
     {
-        preview.transform.position = mouseWorldPosition;
-        List<Vector3> buildPosition = preview.BuildingModels.GetAllBuldingPosition();
-        bool canBuild = grid.CanBuild(buildPosition);
+        List<Vector3> rotatedOffsets = preview.BuildingModels.GetRotatedShapeUnitOffsets();
+
+        List<Vector3> worldPositionsBasedOnMouse = rotatedOffsets.Select(offset => mouseWorldPosition + offset).ToList();
+
+        bool canBuild = grid.CanBuild(worldPositionsBasedOnMouse);
 
         if (canBuild)
         {
-            preview.transform.position = GetSnappedCenterPosition(buildPosition);
-            preview.ChangeState(BuildingPreview.BuildingPreviewState.POSITIVE);
+            Vector3 snappedCenterPosition = GetSnappedCenterPosition(worldPositionsBasedOnMouse);
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                PlaceBuilding(buildPosition);
-            }
+            preview.transform.position = snappedCenterPosition;
+            preview.ChangeState(BuildingPreview.BuildingPreviewState.POSITIVE);
         }
         else
         {
+            preview.transform.position = mouseWorldPosition;
             preview.ChangeState(BuildingPreview.BuildingPreviewState.NEGATIVE);
         }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            preview.Rotate(90);
+            preview.AddRotation(90);
         }
     }
 
@@ -81,6 +125,7 @@ public class BuildingSystem : MonoBehaviour
 
         Destroy(preview.gameObject);
         preview = null;
+        isMovingBuilding = false;
     }
 
     private Vector3 GetSnappedCenterPosition(List<Vector3> allBuildingPosition)
@@ -91,7 +136,7 @@ public class BuildingSystem : MonoBehaviour
         float centerX = (xs.Min() + xs.Max()) / 2f + CellSize / 2f;
         float centerZ = (zs.Min() + zs.Max()) / 2f + CellSize / 2f;
 
-        return new Vector3(centerX, 0, centerZ);
+        return new Vector3(centerX, grid.transform.position.y, centerZ);
     }
 
     private Vector3 GetMouseWorldPosition()
@@ -111,16 +156,50 @@ public class BuildingSystem : MonoBehaviour
     {
         BuildingPreview buildingPreview = Instantiate(previewPrefab, position, Quaternion.identity);
         buildingPreview.Setup(data);
+        isMovingBuilding = false;
         return buildingPreview;
     }
+
     public bool HasActivePreview() => preview != null;
+
     public void CancelPreview()
     {
-        if (preview != null)
-        {
-            Destroy(preview.gameObject);
-            preview = null;
-        }
+        CancelCurrentPreview();
     }
 
+    public void StartMovingBuilding(Building buildingToMove, BuildingGrid grid)
+    {
+        if (preview != null) return;
+
+        oldPositions = buildingToMove.Data.Model.GetAllBuldingPosition();
+        oldRotation = buildingToMove.Rotation;
+        oldCenterPos = buildingToMove.transform.position;
+        oldData = buildingToMove.Data;
+
+        List<BuildingGridCell> cellsToClear = new List<BuildingGridCell>();
+        for (int x = 0; x < grid.GetLength(0); x++)
+        {
+            for (int y = 0; y < grid.GetLength(1); y++)
+            {
+                var cell = grid.GetCell(x, y);
+                if (cell.GetBuilding() == buildingToMove)
+                {
+                    cellsToClear.Add(cell);
+                }
+            }
+        }
+
+        foreach (var cell in cellsToClear)
+        {
+            cell.Clear();
+        }
+
+        Destroy(buildingToMove.gameObject);
+
+        Vector3 mousePos = GetMouseWorldPosition();
+        preview = CreatePreview(oldData, mousePos);
+        preview.SetRotation(oldRotation);
+
+        isMovingBuilding = true;
+    }
 }

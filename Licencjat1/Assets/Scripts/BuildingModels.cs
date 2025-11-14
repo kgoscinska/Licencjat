@@ -14,14 +14,27 @@ public class BuildingModels : MonoBehaviour
     {
         shapeUnits = GetComponentsInChildren<BuildingShapeUnit>();
     }
-
-    public void Rotate(float rotationStep)
+    public void AddRotation(float rotationStep)
     {
         wrapper.Rotate(new Vector3(0, rotationStep, 0));
+    }
+
+    public void SetRotation(float yRotation)
+    {
+        wrapper.eulerAngles = new Vector3(0, yRotation, 0);
     }
 
     public List<Vector3> GetAllBuldingPosition()
     {
         return shapeUnits.Select(unit => unit.transform.position).ToList();
+    }
+    public List<Vector3> GetRotatedShapeUnitOffsets()
+    {
+        if (shapeUnits == null)
+        {
+            shapeUnits = GetComponentsInChildren<BuildingShapeUnit>();
+        }
+
+        return shapeUnits.Select(unit => unit.transform.position - transform.position).ToList();
     }
 }
