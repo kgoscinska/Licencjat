@@ -348,17 +348,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 670373032}
   autoFindTarget: 0
-  rotateSpeed: 200
-  verticalRotationRange: 40
+  YRotationMaxSpeed: 90
+  YPositionMax: 15
   zoomSpeed: 200
   minZoomDistance: 2
   maxZoomDistance: 50
-  panSpeed: 0.3
-  forwardKey: 119
-  backwardKey: 115
-  leftKey: 97
-  rightKey: 100
-  smoothSpeed: 0.0025
+  panYSpeed: 1
+  smoothTime: 1
+  mouseSensitivity: 1
 --- !u!1 &353149040
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,7 +691,7 @@ Transform:
   m_GameObject: {fileID: 670373031}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.894, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
