@@ -1,4 +1,3 @@
-// BuildingSystem.cs (ca?y skrypt z wszystkimi poprzednimi modyfikacjami)
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,20 +17,19 @@ public class BuildingSystem : MonoBehaviour
     private BuildingPreview preview;
     private bool isMovingBuilding = false;
 
-    // Pola do przechowywania danych oryginalnego budynku podczas przenoszenia
     private BuildingData oldData;
     private float oldRotation;
     private Vector3 oldCenterPos;
     private List<Vector3> oldPositions;
 
-    private BuildingEQ eq;  // zamiast starego inventory
+    private BuildingEQ inventory;
 
     private void Start()
     {
-        eq = FindObjectOfType<BuildingEQ>();
-        if (eq != null)
+        inventory = FindObjectOfType<BuildingEQ>();
+        if (inventory != null)
         {
-            eq.Initialize(new List<BuildingData> { buildingData1, buildingData2, buildingData3 });
+            inventory.Initialize(new List<BuildingData> { buildingData1, buildingData2, buildingData3 });
         }
     }
 
@@ -41,46 +39,35 @@ public class BuildingSystem : MonoBehaviour
 
         if (preview != null)
         {
+
             HandlePreview(mousePos);
+
+
+            if (Input.GetKeyDown(KeyCode.R))
+                preview.AddRotation(90);
 
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetMouseButtonDown(1))
             {
                 CancelCurrentPreview();
+                return;
             }
-            else if (isMovingBuilding)
+
+            if (isMovingBuilding)
             {
-                // Dla trybu drag & drop (przenoszenie): postaw na MouseUp, je?li valid, inaczej cancel (przywró?)
                 if (Input.GetMouseButtonUp(0))
                 {
                     if (preview.State == BuildingPreview.BuildingPreviewState.POSITIVE)
                     {
-                        List<Vector3> finalBuildPosition = preview.BuildingModels.GetRotatedShapeUnitOffsets()
-                            .Select(offset => preview.transform.position + offset).ToList();
-                        PlaceBuilding(finalBuildPosition);
+                        List<Vector3> positions = preview.BuildingModels.GetRotatedShapeUnitOffsets()
+                            .Select(o => preview.transform.position + o).ToList();
+                        PlaceBuilding(positions);
                     }
                     else
                     {
                         CancelCurrentPreview();
                     }
                 }
-            }
-            else
-            {
-                // Dla normalnego budowania: postaw na MouseDown, je?li valid
-                if (Input.GetMouseButtonDown(0))
-                {
-                    if (preview.State == BuildingPreview.BuildingPreviewState.POSITIVE)
-                    {
-                        List<Vector3> finalBuildPosition = preview.BuildingModels.GetRotatedShapeUnitOffsets()
-                            .Select(offset => preview.transform.position + offset).ToList();
-                        PlaceBuilding(finalBuildPosition);
-                    }
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                preview.AddRotation(90);
+                return;
             }
         }
     }
@@ -89,7 +76,6 @@ public class BuildingSystem : MonoBehaviour
     {
         if (isMovingBuilding)
         {
-            // Przywró? oryginalny budynek w starej pozycji
             Building restoredBuilding = Instantiate(buildingPrefab, oldCenterPos, Quaternion.identity);
             restoredBuilding.Setup(oldData, oldRotation);
             grid.SetBuilding(restoredBuilding, oldPositions);
@@ -164,7 +150,7 @@ public class BuildingSystem : MonoBehaviour
     {
         BuildingPreview buildingPreview = Instantiate(previewPrefab, position, Quaternion.identity);
         buildingPreview.Setup(data);
-        isMovingBuilding = false; // Dla normalnego preview
+        isMovingBuilding = false;
         return buildingPreview;
     }
 
@@ -179,13 +165,12 @@ public class BuildingSystem : MonoBehaviour
     {
         if (preview != null) return;
 
-        // Zapami?taj oryginalne pozycje i dane przed zniszczeniem
-        oldPositions = buildingToMove.Data.Model.GetAllBuldingPosition(); // Zak?adam, ?e to statyczna metoda lub dost?pna
+
+        oldPositions = buildingToMove.Data.Model.GetAllBuldingPosition();
         oldRotation = buildingToMove.Rotation;
         oldCenterPos = buildingToMove.transform.position;
         oldData = buildingToMove.Data;
 
-        // Wyczy?? komórki
         List<BuildingGridCell> cellsToClear = new List<BuildingGridCell>();
         for (int x = 0; x < grid.GetLength(0); x++)
         {
@@ -204,15 +189,12 @@ public class BuildingSystem : MonoBehaviour
             cell.Clear();
         }
 
-        // Zniszcz stary budynek
         Destroy(buildingToMove.gameObject);
 
-        // Stwórz preview w pozycji myszy dla p?ynnego drag
         Vector3 mousePos = GetMouseWorldPosition();
         preview = CreatePreview(oldData, mousePos);
         preview.SetRotation(oldRotation);
 
-        // Ustaw flag? drag & drop
         isMovingBuilding = true;
     }
 
@@ -221,5 +203,38 @@ public class BuildingSystem : MonoBehaviour
         if (preview != null) Destroy(preview.gameObject);
         preview = CreatePreview(data, position);
         return preview;
+    }
+
+    public void UpdatePreviewPosition(Vector3 worldPosition)
+    {
+        if (preview != null)
+        {
+            List<Vector3> rotatedOffsets = preview.BuildingModels.GetRotatedShapeUnitOffsets();
+            List<Vector3> worldPositions = rotatedOffsets.Select(offset => worldPosition + offset).ToList();
+
+            bool canBuild = grid.CanBuild(worldPositions);
+
+            if (canBuild)
+            {
+                Vector3 snapped = GetSnappedCenterPosition(worldPositions);
+                preview.transform.position = snapped;
+                preview.ChangeState(BuildingPreview.BuildingPreviewState.POSITIVE);
+            }
+            else
+            {
+                preview.transform.position = worldPosition;
+                preview.ChangeState(BuildingPreview.BuildingPreviewState.NEGATIVE);
+            }
+        }
+    }
+
+    public void PlaceCurrentPreview()
+    {
+        if (preview != null && preview.State == BuildingPreview.BuildingPreviewState.POSITIVE)
+        {
+            List<Vector3> offsets = preview.BuildingModels.GetRotatedShapeUnitOffsets();
+            List<Vector3> positions = offsets.Select(o => preview.transform.position + o).ToList();
+            PlaceBuilding(positions);
+        }
     }
 }
